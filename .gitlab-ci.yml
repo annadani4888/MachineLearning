@@ -1,0 +1,13 @@
+stages:
+  - format
+
+format:
+  image: python:3.10
+  stage: format
+  before_script:
+    - python3 -m pip install -r requirements-dev.txt -r requirements.txt
+  script:
+    - pre-commit run --all-files
+  only:
+    - main
+    - merge_requests
