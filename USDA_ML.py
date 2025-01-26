@@ -15,7 +15,7 @@ from sklearn.tree import DecisionTreeClassifier
 import matplotlib.pyplot as plt
 
 # Sentinel Hub configuration
-config = SHConfig(profile="annatesting")
+config = SHConfig(profile="<sh_profile_name>")
 
 # Define my AOI bounding box
 # Load the GeoJSON file
