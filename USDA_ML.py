@@ -19,7 +19,7 @@ config = SHConfig(profile="annatesting")
 
 # Define my AOI bounding box
 # Load the GeoJSON file
-with open('/home/anna.rouse/Downloads/iowa-aoi/iowa_arps_box.geojson') as f:
+with open('path_to_aoi.geojson') as f:
     aoi_geojson = json.load(f)
 
 # Extract the coordinates of the polygon
@@ -85,7 +85,7 @@ request_byoc = SentinelHubRequest(
     evalscript=evalscript_byoc,
     input_data=[
         SentinelHubRequest.input_data(
-            data_collection=DataCollection.define_byoc("c57c4f30-d5b5-4fdb-bf5e-af20d51f301a")
+            data_collection=DataCollection.define_byoc("<sh_collection_id>")
         )
     ],
     responses=[SentinelHubRequest.output_response("default", MimeType.TIFF)],
@@ -99,7 +99,7 @@ request_planet = SentinelHubRequest(
     evalscript=evalscript_planet,
     input_data=[
         SentinelHubRequest.input_data(
-            data_collection=DataCollection.define_byoc("a3729550-2ba2-4ae5-8f1e-e8ac62dd050d"),
+            data_collection=DataCollection.define_byoc("<sh_collection_id"),
             time_interval=("2023-04-10", "2023-04-24"),
         )
     ],
@@ -193,7 +193,7 @@ print("DataFrame Head:")
 print(df.head())
 
 # Save DataFrame to a CSV file
-output_path = "/home/anna.rouse/Downloads/iowa-aoi/arps_combined_df.csv"
+output_path = "output_path.csv"
 df.to_csv(output_path, index=False)
 print(f"DataFrame saved to {output_path}")
 
