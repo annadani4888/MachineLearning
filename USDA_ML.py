@@ -213,9 +213,28 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_
 
 # Train the initial model
 from sklearn.tree import DecisionTreeClassifier
+from imblearn.over_sampling import SMOTE
+from sklearn.impute import SimpleImputer
 
+# Eliminate NaNs before applying SMOTE
+
+imputer = SimpleImputer(strategy="mean") # Replace NaNs with the column mean
+X = imputer.fit_transform(X)
+
+# Verify NaNs are handled
+print("Are there NaNs in X?", pd.DataFrame(X).isnull().sum().sum())
+
+print("Shape of X before SMOTE:", X.shape)
+print("Shape of y before SMOTE:", y.shape)
+smote = SMOTE(random_state=42)
+X_train_balanced, y_train_balanced = smote.fit_resample(X, y)
+print("Shape of X_train_balanced:", X_train_balanced.shape)
+print("Shape of y_train_balanced:", y_train_balanced.shape)
+print("Class distribution after oversampling:", dict(pd.Series(y_train_balanced).value_counts()))
+
+#weights = {36: 2, 255: 1} # Assign more weights to Corn (255)
 model = DecisionTreeClassifier(max_depth=10, random_state=42)
-model.fit(X_train, y_train)
+model.fit(X_train_balanced, y_train_balanced)
 
 # Evaluate the model on the test set
 from sklearn.metrics import classification_report, accuracy_score
@@ -246,8 +265,8 @@ best_model = grid_search.best_estimator_
 best_model.fit(X_train, y_train)
 
 # Visualize the Decision Tree
-from sklearn.tree import export_text
+#from sklearn.tree import export_text
 
-tree_rules = export_text(best_model, feature_names=["Blue", "Green", "Red", "NIR"])
-print(tree_rules)
+#tree_rules = export_text(best_model, feature_names=["Blue", "Green", "Red", "NIR"])
+#print(tree_rules)
 

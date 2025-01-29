@@ -1,1 +1,7 @@
 #Libraries that your project use
+numpy
+pandas
+sentinelhub
+scikit-learn
+matplotlib
+imbalanced-learn
