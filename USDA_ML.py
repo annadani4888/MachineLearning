@@ -26,7 +26,7 @@ config = SHConfig(profile="annatesting")
 
 # Define my AOI bounding box
 # Load the GeoJSON file
-with open("/home/anna.rouse/Downloads/iowa-aoi/iowa_arps_box.geojson") as f:
+with open("path_to_geojson") as f:
     aoi_geojson = json.load(f)
 
 # Extract the coordinates of the polygon
@@ -93,7 +93,7 @@ request_byoc = SentinelHubRequest(
     input_data=[
         SentinelHubRequest.input_data(
             data_collection=DataCollection.define_byoc(
-                "c57c4f30-d5b5-4fdb-bf5e-af20d51f301a"
+                "collection_id"
             )
         )
     ],
@@ -109,7 +109,7 @@ request_planet = SentinelHubRequest(
     input_data=[
         SentinelHubRequest.input_data(
             data_collection=DataCollection.define_byoc(
-                "a3729550-2ba2-4ae5-8f1e-e8ac62dd050d"
+                "collection_id"
             ),
             time_interval=("2023-04-10", "2023-04-24"),
         )
@@ -178,7 +178,7 @@ data = {
 data_frame = pd.DataFrame(data)
 
 # Save DataFrame to a CSV file
-output_path = "/home/anna.rouse/Downloads/iowa-aoi/arps_combined_data_frame.csv"
+output_path = "path_to_csv_file.csv"
 data_frame.to_csv(output_path, index=False)
 
 ## TRAIN ML MODEL
