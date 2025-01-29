@@ -1,68 +1,64 @@
-# Basic Project Structure
+## **Overview**
 
-This is a basic project template, which would be composed only by python scripts and notebooks, some data folder and documentation. You may need to add extensions to gititnore if needed.
+This script processes geospatial data to classify agricultural crops within a specific Area of Interest (AOI) in Iowa, USA. It integrates satellite imagery from PlanetScope (PS) and the USDA's Crop Data Layer (CDL), ingests them into Sentinel Hub for processing, and trains a machine learning (ML) model to identify pixels representing Corn or Soybeans. The goal is to create a predictive ML model using the features derived from the satellite data.
 
-<pre>
-project_name/
-│
-├── .gitignore                    # Gitignore file to specify ignored files and directories
-├── gitlab-ci.yml                 # Basic GitLab CI file
-├── pre-commit-config.yaml        # Basic pre-commit config file
-├── pyproject.toml                # TOML configuration file often used for tool settings and project metadata
-├── README.md                     # Project README with an overview, setup, and usage instructions
-├── requirements.txt              # File listing project dependencies
-├── requirements-dev.txt          # File listing project dependencies for development
-├── data/                         # Directory with data archives; add files here and include in gitinore if needed (optional)
-├── notebooks/                    # Directory for Jupyter notebooks (optional)
-├── scripts/                      # Directory for Python scripts (optional)
-└── env/                          # Your environment (This will be in gitignore)
-</pre>
+**Key Steps**
+ 1. **Configuring Sentinel Hub** 
+ The script initializes a Sentinel Hub configuration using a specific user profile (`annatesting`) and sets up a bounding box (BBox) for the AOI based on a .geojson file.
+ 2. **CDL and PlanetScope Data Retrieval**
+    - **CDL Data (Raster Classifications)**:
+    - Data is requested via SentinelHubRequest from a user-defined BYOC (Bring Your Own COG) collection. (The collection was created by the user, by ingesting the CDL raster into Sentinel Hub).
+    - The CDL Evalscript extracts class-specific crop information (Corn = 255, Soybeans = 36) and a data mask.
+      
+    - **PlanetScope Data (Satellite Imagery)**:
+	- This data comes from a separate BYOC collection. The data is requested from the SentinelHub API. The request includes a specified time interval.
+	- The PlanetScope Evalscript retrieves multi-band data (Blue, Green, Red, NIR) and a scene mask to filter valid pixels.
+	
+ 3. **Data Preprocessing**
+ 
+	 The CDL and PlanetScope responses are converted into NumPy arrays and filtered:
+	 
+	 - **CDL**: Only valid crop classes (Corn and Soybeans) are retained.
+	 - **PlanetScope**: Bands are filtered using the scene mask to exclude invalid pixels.
 
-# Setting Up a Virtual Environment and Running Pre-commit Hooks
 
-## Step 1: Create and Activate a Virtual Environment
+ 4. **Data Handling and Output**:
+    - The DataFrame is exported to a CSV file for persistence and further analysis.
+    - Basic descriptive statistics and troubleshooting logs are included, such as class distribution and pixel validity checks.
 
-To isolate your project's dependencies, create and activate a virtual environment using Python's built-in `venv`:
+5. **Machine Learning Model Training**
+   
+    **Preprocessing**:
+      - Missing values (NaN) in the dataset are imputed using column means.
+      - Class imbalance is addressed with SMOTE (Synthetic Minority Oversampling Technique) to ensure equal representation of Corn and Soybean pixels in the training data.
+               
+    **Model:**
+   - A Decision Tree Classifier is trained using the spectral bands (Blue, Green, Red, NIR) as features and the crop classes as labels.
+   - Hyperparameter tuning is performed with GridSearchCV to optimize tree depth and splitting criteria.
 
-```bash
-# Create a virtual environment named "myenv"
-python3 -m venv env
+6. **Evaluation:**
+The trained model is evaluated using:
+    - Classification metrics (accuracy, precision, recall, F1-score).
+    - Cross-validation scores to assess model generalization.
+ 
+ 
 
-# Activate the virtual environment
-#For Linux/MacOs
-source env/bin/activate
+## Technical Highlights
+-   **Sentinel Hub Integration**:
+    
+    -   The script leverages Sentinel Hub's Python package for seamless interaction with geospatial data repositories and custom Evalscripts for raster-based classification and feature extraction.
+-   **Data Masking and Cleaning**:
+    
+    -   Scene masks and class filtering ensure that only meaningful pixels are used for training, mitigating noise from invalid or irrelevant data.
+-   **Machine Learning with Imbalance Handling**:
+    
+    -   Incorporates SMOTE to address class imbalance between Corn and Soybean pixels.
+    -   Uses hyperparameter tuning (via GridSearchCV) and cross-validation to ensure robust model training and evaluation.
 
-# For Windows
-.\env\Scripts\activate
+## Use Case
 
-```
+This script is intended for land classification in precision agriculture, providing a pipeline for:
 
-## Step 2: Install requirements
-
-Next, install requirements and requirements-dev.
-
-```bash
-# Ensure you are inside the activated virtual environment
-# Install requirements using pip
-python3 -m pip install -r requirements-dev.txt -r requirements.txt
-```
-
-## Step 3: Install the Hooks
-
-Install the pre-commit hooks defined in your configuration:
-
-```bash
-pre-commit install
-```
-
-## Step 4: Run the Hooks
-
-The pre-commit hooks will now run automatically when you attempt to commit changes. To run the hooks manually, use the following command:
-
-```bash
-pre-commit run --all-files
-```
-
-This will execute the configured hooks on all files in the repository.
-
-Now, whenever you attempt to commit changes, the hooks will be triggered, ensuring consistent formatting and code quality.
+- Processing satellite and crop-specific data layers.
+- Preparing a training dataset with meaningful spectral features.
+- Developing predictive models to classify agricultural crops in a specific AOI.
