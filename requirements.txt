@@ -1,1 +1,7 @@
-#Libraries that your project use
+# Libraries needed for this package
+imbalanced-learn
+matplotlib
+numpy
+pandas
+scikit-learn
+sentinelhub
